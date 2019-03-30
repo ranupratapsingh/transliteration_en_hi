@@ -1,4 +1,5 @@
 import axios from 'axios';
+import cache from './cache';
 
 async function getFromGoogle(englishString){
   let url = 'https://www.google.com/inputtools/request';
@@ -13,18 +14,36 @@ async function getFromGoogle(englishString){
 }
 
 async function getHindiString(englishString) {
+  if(!englishString)
+    return englishString;
   let response = await getFromGoogle(englishString);
   let hindi;
   try {
     hindi = response.data[1][0][1][0];
   }catch{
-    hindi = 'some error in getting data';
+    hindi = '';
+    console.error('some error in getting data');
   }
   return hindi;
 }
 
 async function transliterateEnToHi(englishText){
-  let hindiText = await getHindiString(englishText);
+  let engTextArr = englishText.split('.');
+  let hiTextArrPomise = engTextArr.map(async (englishText) => {
+    let hindiText;
+    if(!englishText){
+      hindiText = englishText;
+      cache.set(englishText, hindiText);
+    }
+    hindiText = cache.get(englishText);
+    if(!hindiText){
+      hindiText = await getHindiString(englishText);
+      cache.set(englishText, hindiText);
+    }
+    return hindiText;
+  });
+  let hiTextArr = await Promise.all(hiTextArrPomise);
+  let hindiText = await hiTextArr.join('.');
   return hindiText;
 }
 
