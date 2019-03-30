@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
-import getHindiString from '../utils/adapter';
+import transliterateEnToHi from '../utils/adapter';
 
 class EditorContainer extends Component {
   constructor(){
@@ -10,11 +10,9 @@ class EditorContainer extends Component {
   handleChange = (event) => {
     let that = this;
     let text = event.target.value;
-    getHindiString(text).then((response) => {
-      let hindi = response.data[1][0][1][0];
+    transliterateEnToHi(text).then((hindi) => {
       that.setState({text2: hindi});
     });
-    // getHindiString(text).then(function(data){debugger});
     this.setState({text1: text});
   }
   render() {

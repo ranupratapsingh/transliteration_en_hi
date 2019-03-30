@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-function getHindiString(englishString){
+async function getFromGoogle(englishString){
   let url = 'https://www.google.com/inputtools/request';
   let params = {
     text: englishString,
@@ -9,19 +9,23 @@ function getHindiString(englishString){
     ie:'utf-8',
     oe:'utf-8'
   };
-    // -H 'Referer: http://indiatyping.com/index.php/english-to-hindi-typing
   return axios.get(url, {params: params});
-    // .then(function (response) {
-    //   let hindi = response.data[1][0][1][0];
-    // //   console.log(hindi);
-    //   return hindi;
-    // })
-    // .catch(function (error) {
-    //   console.log(error);
-    // })
-    // .then(function () {
-    // // always executed
-    // });
 }
 
-export default getHindiString;
+async function getHindiString(englishString) {
+  let response = await getFromGoogle(englishString);
+  let hindi;
+  try {
+    hindi = response.data[1][0][1][0];
+  }catch{
+    hindi = 'some error in getting data';
+  }
+  return hindi;
+}
+
+async function transliterateEnToHi(englishText){
+  let hindiText = await getHindiString(englishText);
+  return hindiText;
+}
+
+export default transliterateEnToHi;
